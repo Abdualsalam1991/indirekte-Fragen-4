@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frag mal indirekt! – Sprechspiel mit dem Computer</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1d2733;--mu:#5b6775;--bd:#d5dbe2;--ac:#1f7a8c;--f1:#2b7bb9;--f1b:#e3f0fa;--f2:#c26a14;--f2b:#fdf0e1;--f3:#7a4fb0;--f3b:#efe8f8;--ok:#1b8a4b;--okb:#e1f5e9;--no:#c0392b;--nob:#fbe6e3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181d;--card:#1d242c;--tx:#e8edf2;--mu:#9aa6b3;--bd:#34404c;--ac:#5cc0d3;--f1:#7db8ea;--f1b:#1c3042;--f2:#f0a35c;--f2b:#3a2c1b;--f3:#b999e6;--f3b:#2e2540;--ok:#5fd08d;--okb:#173524;--no:#ff8a7c;--nob:#3a1f1c}}
+:root[data-theme="dark"]{--bg:#14181d;--card:#1d242c;--tx:#e8edf2;--mu:#9aa6b3;--bd:#34404c;--ac:#5cc0d3;--f1:#7db8ea;--f1b:#1c3042;--f2:#f0a35c;--f2b:#3a2c1b;--f3:#b999e6;--f3b:#2e2540;--ok:#5fd08d;--okb:#173524;--no:#ff8a7c;--nob:#3a1f1c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:1.5rem;margin:.4rem 0 .2rem}
+.sub{color:var(--mu);margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin:0 0 16px}
+.funcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.fn{border-radius:10px;padding:10px 12px;font-size:.92rem;border:1px solid var(--bd)}
+.fn b{display:block;font-size:1rem}.fn span{color:var(--tx)}
+.f0{background:var(--f1b);color:var(--f1)}.f1{background:var(--f2b);color:var(--f2)}.f2{background:var(--f3b);color:var(--f3)}
+.tip{background:var(--bg);border-left:4px solid var(--ac);padding:8px 12px;border-radius:6px;font-size:.93rem;margin-top:10px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.pts{font-size:1.4rem;font-weight:700;color:var(--ac)}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 16px}
+button:hover:not(:disabled){border-color:var(--ac)}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+button.rec{background:var(--no);color:#fff;border-color:var(--no);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.badge{display:inline-block;border-radius:999px;padding:2px 12px;font-weight:700;font-size:.9rem}
+.sit{color:var(--mu);margin:.4rem 0}
+.q{font-size:1.2rem;font-weight:600;margin:.3rem 0}
+.start{font-size:1.15rem;margin:.6rem 0;padding:8px 12px;border:2px dashed var(--bd);border-radius:10px}
+input[type=text]{font:inherit;flex:1;min-width:180px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx)}
+.res{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);display:none}
+.res.ok{background:var(--okb);border:1px solid var(--ok);display:block}
+.res.mid{background:var(--f2b);border:1px solid var(--f2);display:block}
+.res.bad{background:var(--nob);border:1px solid var(--no);display:block}
+.res.info{display:block;border:1px solid var(--bd)}
+.sol{background:var(--okb);border:1px solid var(--ok);border-radius:10px;padding:8px 12px;margin-top:10px}
+.w-ok{color:var(--ok);font-weight:600}.w-no{color:var(--no);font-weight:600;text-decoration:underline}
+.cpu{background:var(--bg);border-radius:10px;padding:8px 12px;margin-top:10px}
+.round{color:var(--mu);font-size:.9rem}
+.end{text-align:center}.end h2{font-size:1.4rem}
+label.t{font-size:.9rem;color:var(--mu);display:inline-flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<main>
+<h1>Frag mal indirekt! 🎲</h1>
+<p class="sub">Rollenspiel mit dem Computer: Er spricht kurz in der Situation, Sie reagieren mit dem vorgegebenen Satzanfang (sprechen oder tippen).</p>
+
+<div class="card">
+  <div class="funcs">
+    <div class="fn f0"><b>🙏 Höflich fragen</b><span>„Entschuldigung, können Sie mir sagen, …“</span></div>
+    <div class="fn f1"><b>💬 Frage weitergeben</b><span>„Lara hat gefragt, …“</span></div>
+    <div class="fn f2"><b>🤷 Nicht wissen</b><span>„Ich weiß nicht, …“</span></div>
+  </div>
+  <div class="tip"><b>Regel:</b> Im Nebensatz steht das Verb am Ende. Ja/Nein-Frage → <b>ob</b>. W-Frage → das W-Wort bleibt (wann, wo, wie lange …).</div>
+  <div class="tip" id="support"></div>
+</div>
+
+<div class="card">
+  <div class="top"><div>Punkte: <span class="pts" id="score">0</span> <span class="round" id="max"></span></div>
+  <div><label class="t"><input type="checkbox" id="snd" checked> Computer spricht</label> <button id="restart">Neues Spiel</button></div></div>
+</div>
+
+<div class="card" id="stage"></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const FN=[
+ {n:'🙏 Höflich fragen',c:'f0',task:'Sie möchten die Information haben. Antworten Sie dem Computer und fragen Sie höflich (indirekt).',who:'cp',key:'können sie mir sagen',reply:'Ja, natürlich, gern. Einen Moment, ich schaue nach.'},
+ {n:'💬 Frage weitergeben',c:'f1',task:'Reagieren Sie auf die Frage des Computers und geben Sie die Frage weiter.',who:'cr',key:'hat gefragt',reply:'Danke für die Information. Das kann ich gern weitergeben.'},
+ {n:'🤷 Nicht wissen',c:'f2',task:'Reagieren Sie auf die Frage des Computers: Sie haben die Information nicht.',who:'cu',key:'ich weiß nicht',reply:'Schade. Dann schauen wir zusammen nach.'}
+];
+const CARDS=[
+ {s:'Sie rufen bei einer Zeitung an.',q:'Kann man bei Ihnen ein Praktikum machen?',w:'Lara',cp:'ob man bei Ihnen ein Praktikum machen kann',cr:'ob man bei der Zeitung ein Praktikum machen kann',cu:'ob man dort ein Praktikum machen kann',o:'Redaktion, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie schon, ob man dort ein Praktikum machen kann?',a:'Ja, bei uns sind Praktika möglich. Schicken Sie uns einfach Ihre Bewerbung.'},
+ {s:'Auf einer Messe.',q:'Wie lange ist die Messe geöffnet?',w:'Ein Besucher',cp:'wie lange die Messe geöffnet ist',cr:'wie lange die Messe geöffnet ist',cu:'wie lange die Messe geöffnet ist',o:'Willkommen auf der Messe! Wie kann ich Ihnen helfen?',u:'Wissen Sie, wie lange die Messe heute geöffnet ist?',a:'Die Messe ist heute bis achtzehn Uhr geöffnet.'},
+ {s:'Im Reisebüro.',q:'Brauche ich ein Visum für die Reise?',w:'Melek',cp:'ob ich ein Visum für die Reise brauche',cr:'ob sie ein Visum für die Reise braucht',cu:'ob ich ein Visum für die Reise brauche',o:'Reisebüro Sonnenschein, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie schon, ob Sie ein Visum brauchen?',a:'Für diese Reise brauchen Sie kein Visum, nur Ihren Reisepass.'},
+ {s:'In einer fremden Stadt, auf der Straße.',q:'Wo ist die Arztpraxis?',w:'Der Tourist',cp:'wo die Arztpraxis ist',cr:'wo die Arztpraxis ist',cu:'wo die Arztpraxis ist',o:'Guten Tag. Kann ich Ihnen helfen?',u:'Wissen Sie, wo die Arztpraxis ist?',a:'Die Arztpraxis ist gleich dort drüben, neben der Apotheke.'},
+ {s:'Bei der Personalabteilung.',q:'Wann bekomme ich eine Antwort auf meine Bewerbung?',w:'Joe',cp:'wann ich eine Antwort auf meine Bewerbung bekomme',cr:'wann er eine Antwort auf seine Bewerbung bekommt',cu:'wann ich eine Antwort auf meine Bewerbung bekomme',o:'Personalabteilung, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie, wann Sie eine Antwort bekommen?',a:'Sie bekommen die Antwort in etwa zwei Wochen.'},
+ {s:'Beim Vorstellungsgespräch.',q:'Braucht man für den Job einen Führerschein?',w:'Klaus',cp:'ob man für den Job einen Führerschein braucht',cr:'ob man für den Job einen Führerschein braucht',cu:'ob man für den Job einen Führerschein braucht',o:'Guten Tag, nehmen Sie bitte Platz. Haben Sie noch eine Frage?',u:'Wissen Sie, ob man für den Job einen Führerschein braucht?',a:'Ja, für diesen Job brauchen Sie einen Führerschein.'},
+ {s:'In der Beratungsstelle.',q:'Wie lange dauert das FSJ?',w:'Darya',cp:'wie lange das FSJ dauert',cr:'wie lange das FSJ dauert',cu:'wie lange das FSJ dauert',o:'Beratungsstelle, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie, wie lange das FSJ dauert?',a:'Ein FSJ dauert in der Regel ein Jahr.'},
+ {s:'In der Sprachschule.',q:'Wann beginnt der Deutschkurs?',w:'Ein Teilnehmer',cp:'wann der Deutschkurs beginnt',cr:'wann der Deutschkurs beginnt',cu:'wann der Deutschkurs beginnt',o:'Sprachschule, guten Tag. Was kann ich für Sie tun?',u:'Wissen Sie, wann der Deutschkurs beginnt?',a:'Der Kurs beginnt am Montag um neun Uhr.'},
+ {s:'Im Fundbüro.',q:'Wo ist meine Gesundheitskarte?',w:'Klaus',cp:'wo meine Gesundheitskarte ist',cr:'wo seine Gesundheitskarte ist',cu:'wo meine Gesundheitskarte ist',o:'Fundbüro, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie, wo Ihre Gesundheitskarte ist?',a:'Einen Moment, ich schaue nach. Ja, hier liegt eine Karte.'},
+ {s:'Am Bahnhof.',q:'Wie viel kostet die Fahrkarte?',w:'Lara',cp:'wie viel die Fahrkarte kostet',cr:'wie viel die Fahrkarte kostet',cu:'wie viel die Fahrkarte kostet',o:'Reisezentrum, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie, wie viel die Fahrkarte kostet?',a:'Die Fahrkarte kostet zwölf Euro fünfzig.'},
+ {s:'Beim Anruf bei einer Firma.',q:'Ist die Stelle noch frei?',w:'Melek',cp:'ob die Stelle noch frei ist',cr:'ob die Stelle noch frei ist',cu:'ob die Stelle noch frei ist',o:'Firma Nordlicht, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie, ob die Stelle noch frei ist?',a:'Ja, die Stelle ist noch frei.'},
+ {s:'Beim Anruf in einer Arztpraxis.',q:'Ist die Praxis am Samstag geöffnet?',w:'Ein Patient',cp:'ob die Praxis am Samstag geöffnet ist',cr:'ob die Praxis am Samstag geöffnet ist',cu:'ob die Praxis am Samstag geöffnet ist',o:'Arztpraxis, guten Tag. Wie kann ich Ihnen helfen?',u:'Wissen Sie, ob die Praxis am Samstag geöffnet ist?',a:'Am Samstag ist die Praxis von neun bis zwölf Uhr geöffnet.'}
+];
+const START=[()=> 'Entschuldigung, können Sie mir sagen, ',c=>c.w+' hat gefragt, ',()=> 'Ich weiß nicht, '];
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const TTS='speechSynthesis' in window;
+let st,rec=null,lastHeard='';
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>s.toLowerCase().replace(/[.,!?;:„“"’']/g,' ').replace(/\s+/g,' ').trim();
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const wl=w=>/^(Ein|Der) /.test(w)?w[0].toLowerCase()+w.slice(1):w;
+const cline=(c,f)=>f===0?c.o:f===1?'Und was hat '+wl(c.w)+' gefragt?':c.u;
+const reply=(c,f)=>f===0?c.a:f===1?pick(['Ach so, danke für die Information.','Aha, das ist gut zu wissen. Danke!','Okay, danke.']):pick(['Schade. Dann frage ich jemand anderen.','Ach so, na gut. Dann suche ich selbst.','Okay, kein Problem.']);
+const expected=()=>{const c=st.deck[st.idx],f=st.fn;return START[f](c)+c[FN[f].who]};
+$('support').innerHTML=SR?'🎤 Spracherkennung verfügbar. Beim ersten Klick auf „Sprechen“ muss das Mikrofon erlaubt werden. Alternativ können Sie den Satz tippen.':'⌨️ In diesem Browser gibt es keine Spracherkennung (am besten funktioniert Chrome oder Edge). Sie können Ihren Satz tippen.';
+
+function say(t,cb){
+  if(!TTS||!$('snd').checked){cb&&cb();return}
+  speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='de-DE';
+  const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith('de'));if(v)u.voice=v;
+  u.onend=()=>cb&&cb();speechSynthesis.speak(u);
+}
+function init(){
+  if(rec)try{rec.abort()}catch(e){}
+  st={deck:shuffle(CARDS),idx:-1,fn:0,pts:[],best:0,shown:false,done:false,rolling:false,total:CARDS.length};
+  draw();
+}
+function setScore(){const s=st.pts.reduce((a,b)=>a+b,0);$('score').textContent=s;$('max').textContent='von '+st.total*2}
+function draw(){
+  setScore();const s=$('stage');
+  if(st.done){const sc=st.pts.reduce((a,b)=>a+b,0),m=st.total*2;
+    s.innerHTML=`<div class="end"><h2>${sc>=m*0.8?'Sehr gut! 🏆':sc>=m*0.5?'Gut gemacht! 👍':'Weiter üben! 💪'}</h2><p>Sie haben ${sc} von ${m} Punkten.</p><button class="p" id="again">Noch mal spielen</button></div>`;$('again').onclick=init;return}
+  if(st.idx<0){
+    s.innerHTML=`<p><b>So geht’s:</b></p><ol><li>Auf dem Bildschirm steht die Situation und der Satzanfang. Die Aufgabe steht nur schriftlich da.</li><li>Der Computer sagt kurz etwas, zum Beispiel „Wie kann ich Ihnen helfen?“.</li><li>Sie reagieren: sprechen (🎤) oder tippen Sie Ihren Satz.</li><li>Der Computer prüft den Satz und antwortet wie im echten Gespräch, bei Fehlern mit „Wie bitte?“. <b>2 Punkte</b> für einen richtigen Satz mit passendem Anfang, <b>1 Punkt</b> für fast richtig. Wenn Sie vorher den Lösungsvorschlag ansehen, gibt es für diese Karte keine Punkte.</li></ol><div class="bar"><button class="p" id="draw">Spiel starten</button></div>`;
+    $('draw').onclick=next;return}
+  const c=st.deck[st.idx],f=FN[st.fn],L=cline(c,st.fn);
+  const scene=st.fn===0?`📍 ${c.s}<br>Sie möchten wissen: <b>„${c.q}“</b>`:st.fn===1?`📍 ${c.w} hat Sie gefragt: <b>„${c.q}“</b><br>Jetzt sprechen Sie mit einer anderen Person.`:`📍 Sie kennen die Antwort auf diese Frage nicht: <b>„${c.q}“</b>`;
+  s.innerHTML=`<div class="round">Karte ${st.idx+1} / ${st.total}</div><div class="sit">${scene}</div>
+  <div class="cpu" id="cpuline">🤖 Computer: <b>„${L}“</b> <button id="hear" style="padding:2px 10px">🔊</button></div>
+  <span class="badge ${f.c}" style="margin-top:10px">${f.n}</span><p>${f.task}</p><div class="start">${START[st.fn](c)}<b>…</b></div>
+  <div class="bar"><button id="listen" class="p">🎤 Sprechen</button></div>
+  <div class="bar"><input type="text" id="typed" placeholder="oder hier tippen …" autocomplete="off" autocapitalize="off" spellcheck="false"><button id="chk">Prüfen</button></div>
+  <div class="res" id="res"></div><div id="cpu"></div>
+  <div class="bar"><button id="show">Lösungsvorschlag zeigen</button><button id="nxt" class="p" disabled>Nächste Karte →</button></div><div id="sol"></div>`;
+  $('listen').onclick=listen;$('hear').onclick=()=>say(L);
+  $('chk').onclick=()=>{const v=$('typed').value;if(v.trim())evaluate([v])};
+  $('typed').onkeydown=e=>{if(e.key==='Enter')$('chk').click()};
+  $('show').onclick=showSol;$('nxt').onclick=next;
+  setTimeout(()=>say(L),200);
+}
+function next(){
+  if(st.idx>=st.total-1&&st.idx>=0){st.done=true;draw();return}
+  st.idx++;st.fn=Math.floor(Math.random()*3);st.best=0;st.shown=false;st.pts[st.idx]=0;draw();
+}
+function listen(){
+  const res=$('res');
+  if(!SR){res.className='res info';res.textContent='Keine Spracherkennung in diesem Browser. Bitte tippen Sie Ihren Satz.';return}
+  if(rec)try{rec.abort()}catch(e){}
+  if(TTS)speechSynthesis.cancel();
+  rec=new SR();rec.lang='de-DE';rec.interimResults=true;rec.maxAlternatives=5;rec.continuous=false;
+  const b=$('listen');b.className='rec';b.textContent='⏺ Ich höre zu …';
+  res.className='res info';res.textContent='Sprechen Sie jetzt …';
+  rec.onresult=e=>{const r=e.results[e.results.length-1];
+    if(r.isFinal){const alts=[];for(let i=0;i<r.length;i++)alts.push(r[i].transcript);evaluate(alts)}
+    else res.textContent='… '+r[0].transcript};
+  rec.onerror=e=>{
+    const m={'not-allowed':'Das Mikrofon ist nicht erlaubt oder in dieser Ansicht gesperrt. Bitte tippen Sie Ihren Satz oder öffnen Sie die Seite in einem eigenen Browser-Tab.','service-not-allowed':'Das Mikrofon ist nicht erlaubt. Bitte tippen Sie Ihren Satz.','no-speech':'Ich habe nichts gehört. Bitte versuchen Sie es noch einmal.','audio-capture':'Es wurde kein Mikrofon gefunden.','network':'Die Spracherkennung braucht eine Internetverbindung.'};
+    res.className='res bad';res.textContent=m[e.error]||'Die Spracherkennung hat nicht funktioniert ('+e.error+'). Bitte tippen Sie Ihren Satz.'};
+  rec.onend=()=>{const b=$('listen');if(b){b.className='p';b.textContent='🎤 Sprechen'}};
+  try{rec.start()}catch(e){}
+}
+function lcs(a,b){const m=a.length,n=b.length,d=Array.from({length:m+1},()=>Array(n+1).fill(0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]+1:Math.max(d[i-1][j],d[i][j-1]);
+  const hit=new Set();let i=m,j=n;while(i>0&&j>0){if(a[i-1]===b[j-1]){hit.add(i-1);i--;j--}else if(d[i-1][j]>=d[i][j-1])i--;else j--}
+  return{n:d[m][n],hit}}
+function evaluate(alts){
+  const c=st.deck[st.idx],f=FN[st.fn];
+  const clause=norm(c[f.who]),full=norm(expected());
+  let best={pts:-1,ratio:0,text:alts[0]};
+  alts.forEach(t=>{const g=norm(t),has=g.includes(clause),key=g.includes(f.key);
+    const ratio=lcs(full.split(' '),g.split(' ')).n/full.split(' ').length;
+    let pts=has?(key?2:1):(ratio>=0.85?1:0);
+    if(pts>best.pts||(pts===best.pts&&ratio>best.ratio))best={pts,ratio,text:t,has,key}});
+  lastHeard=best.text;
+  const res=$('res');
+  const heard=`<div>Ich habe verstanden: <i>„${best.text}“</i></div>`;
+  let cpu;
+  if(best.pts===2){res.className='res ok';res.innerHTML='✅ <b>Richtig!</b> Der Satz ist korrekt.'+heard;cpu=reply(c,st.fn)}
+  else if(best.pts===1){res.className='res mid';res.innerHTML=(best.has?`🟡 <b>Fast!</b> Der Nebensatz stimmt, aber der Anfang passt nicht zur Funktion. Beginnen Sie mit: „${START[st.fn](c).trim()}“`:'🟡 <b>Fast!</b> Es sind noch kleine Fehler im Satz. Achten Sie auf die Wortstellung (Verb am Ende).')+heard;cpu=reply(c,st.fn)}
+  else{res.className='res bad';res.innerHTML='❌ <b>Noch nicht ganz.</b> Denken Sie an: Verb am Ende, <b>ob</b> oder W-Wort. Versuchen Sie es noch einmal oder zeigen Sie den Lösungsvorschlag.'+heard;cpu=pick(['Wie bitte?','Wie bitte? Das habe ich nicht verstanden.','Entschuldigung, wie bitte?'])}
+  if(!st.shown&&best.pts>st.best){st.best=best.pts;st.pts[st.idx]=best.pts;setScore()}
+  if(best.pts>0)$('nxt').disabled=false;
+  $('cpu').innerHTML=`<div class="cpu">🤖 Computer: <b>„${cpu}“</b></div>`;
+  if(st.shown&&best.pts>0)$('cpu').innerHTML+=`<div class="cpu">Für diese Karte gibt es keine Punkte, weil der Lösungsvorschlag schon gezeigt wurde.</div>`;
+  showSol(true);
+  say(cpu);
+}
+function showSol(keepHidden){
+  const c=st.deck[st.idx],f=FN[st.fn],exp=expected().split(' ');
+  if(keepHidden===true&&!st.shown)return;
+  if(keepHidden!==true){st.shown=true;st.pts[st.idx]=0;st.best=0;setScore();$('nxt').disabled=false}
+  const got=norm(lastHeard).split(' '),L=lastHeard?lcs(exp.map(norm),got):{hit:new Set()};
+  const html=exp.map((w,i)=>lastHeard?`<span class="${L.hit.has(i)?'w-ok':'w-no'}">${w}</span>`:w).join(' ');
+  $('sol').innerHTML=`<div class="sol">✅ <b>Lösungsvorschlag:</b> ${html}.</div>`;
+  if(keepHidden!==true)say(expected());
+}
+$('restart').onclick=init;
+if(TTS)speechSynthesis.getVoices();
+init();
+</script>
+</body>
+</html>
